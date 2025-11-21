@@ -4,8 +4,9 @@ name: Code Quality Checks
 on:
   push:
     branches:
-      - main
+      - "**"
   pull_request:
+      - "**"
 
 jobs:
   ci:
