@@ -4,12 +4,14 @@ version = "0.1.0"
 description = ""
 authors = ["ducknam3650 <ducknam3650@gamil.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.13"
 django = "^5.0"
 gunicorn = "^22.0.0"
 psycopg2-binary = "^2.9.9"
+python-dotenv = "^1.2.1"
 
 [build-system]
 requires = ["poetry-core"]
