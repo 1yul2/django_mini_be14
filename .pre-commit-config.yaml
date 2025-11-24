@@ -21,3 +21,15 @@ repos:
     hooks:
       - id: ruff
       - id: ruff-format
+
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.34.1
+    hooks:
+      - id: djlint
+        args: ["--reformat"]   # 자동 포맷팅
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
