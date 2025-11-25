@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import Accounts
+from accounts.models import Account
 
 # Create your models here.
 class Transaction(models.Model):
@@ -12,7 +12,7 @@ class Transaction(models.Model):
       ]
 
 
-      account = models.ForeignKey(Accounts, on_delete=models.CASCADE)
+      account = models.ForeignKey(Account, on_delete=models.CASCADE)
       amount = models.IntegerField("거래 금액")
       balance = models.IntegerField("거래 후 잔액")
       description = models.CharField("거래 내역",max_length=255)
