@@ -22,7 +22,7 @@ class TransactionListCreateView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, account_id):
-        account = get_object_or_404(Accounts, id=account_id, user=request.user)
+        account = get_object_or_404(Account, id=account_id, user=request.user)
         serializer = TransactionCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(account=account)
