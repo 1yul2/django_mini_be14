@@ -1,38 +1,25 @@
-from django.db import models 
+from django.db import models
 
-class Transactions(models.Model):
-    TYPE = (
-        ("DEPOSIT", "입금"),
-        ("WITHDRAW", "출금"),
-        ("TRANSFER", "이체"),
-        ("PAYMENT", "결제"),
-        ("REFUND", "환불"),
-        ("CARD","카드 결제"),
-        ("OTHER", "기타"),
-        ("ATM", "ATM 거래"),
-    )
 
-    # account_id = models.IntegerField() #나중에 fk로 연결 할 계획
-    type = models.CharField(max_length=20, choices=TYPE)
-    amount = models.DecimalField(max_digits=12, decimal_places=2)
-    result_amount = models.DecimalField(max_digits=12, decimal_places=2)
-    description = models.TextField()
+# Create your models here.
+class Transaction(models.Model):
+
+   #account = models.ForeignKey(Accounts, on_delete=models.CASCADE)
+    amount = models.IntegerField("거래 금액")
+    balance = models.IntegerField("거래 후 잔액")
+    description = models.CharField("거래 내역",max_length=255)
+    is_deposit = models.BooleanField("입출금 타입")
+    transaction_type = models.CharField("거래 타입",max_length=255)
+    transacted_at = models.DateTimeField("거래 일시")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    balance = models.IntegerField()
-    description = models.CharField(
-        max_length=255,
-        blank=True,
-      
-    )
-    is_deposit = models.BooleanField(default=True)
-    
-    
-    def __str__(self):
-        return self.type
+
+
+   # def __str__(self):
+      #  return self.account.account_name
     
     class Meta:
-        db_table = "transactions"
-        verbose_name = "거래 내역"
-        verbose_name_plural = "거래 내역 목록"
-        ordering = ["-created_at"] 
+        db_table = "transaction"
+        verbose_name = "계좌 조회"
+        verbose_name_plural = "조회 목록"

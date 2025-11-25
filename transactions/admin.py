@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import Transactions
+from .models import Transaction
 
-@admin.register(Transactions)
+@admin.register(Transaction)
 class TransactionsAdmin(admin.ModelAdmin):
-     list_display = ['type', 'amount', 'created_at','balance','is_deposit']
-     list_filter = ['type', 'created_at', 'is_deposit']
+     list_display = ['amount', 'created_at','balance','is_deposit']
+     list_filter = ['created_at', 'is_deposit']
      search_fields = ['description']
      ordering = ['-created_at']
