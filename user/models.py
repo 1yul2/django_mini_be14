@@ -68,6 +68,10 @@ class User(AbstractUser):
     def has_module_perms(self, app_label):
         return True
 
+    def soft_delete(self):
+        self.is_active = False
+        self.save()
+
     @property
     def is_staff(self):
         return self.is_admin
