@@ -161,7 +161,7 @@ from datetime import timedelta
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': True, # 리프레시 토큰을 1회성으로 할 지 설정하는 것
-    'SIGNING_KEY': SECRET_KEY , #! 이거 simple_jwt가 자동으로 해주는데 왜 넣음?
+    'ROTATE_REFRESH_TOKENS': True, 
+    'SIGNING_KEY': SECRET_KEY, 
     "TOKEN_OBTAIN_SERIALIZER": "user.utils.jwt_serializers.MyTokenObtainPairSerializer",
 }
