@@ -2,7 +2,9 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-# Poetry 설치 캐시 사용 안함
+RUN apt-get update && apt-get install -y gcc libpq-dev libyaml-dev && rm -rf /var/lib/apt/lists/*
+
+# Poetry 설치 캐시 사용 안함 + 디버깅용 커맨드 8th line 추가
 RUN pip install --no-cache-dir poetry
 
 # poetry 가상환경 Default 실행 안함
