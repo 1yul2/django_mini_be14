@@ -48,7 +48,8 @@ OWN_APPS = ["apps.users", "apps.accounts", "apps.transactions"]
 THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
-]  # users에서 필요한 라이브러리 추가했습니다.
+    "drf_yasg",
+]
 
 INSTALLED_APPS = DJANGO_APPS + OWN_APPS + THIRD_PARTY_APPS
 
