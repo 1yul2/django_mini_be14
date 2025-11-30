@@ -158,3 +158,16 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     'TOKEN_USER_CLASS': 'apps.users.models.User',
 }
+
+# swagger 문서 세팅
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'JWT 인증을 위해 다음과 같이 입력하세요: Bearer <토큰>',
+        }
+    },
+    'USE_SESSION_AUTH': False,  # Basic Auth 숨김
+}
