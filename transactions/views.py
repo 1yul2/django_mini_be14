@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Transaction
 from accounts.models import Account
-from .serializers import TransactionListSerializer, TransactionCreateSerializer, TransactionDetailSerializer, TransactionUpdateSerializer
+from .serializers import TransactionListSerializer, TransactionCreateSerializer, TransactionDetailSerializer, TransactionUpdateSerializer, recalc_account_balances
 
 
 
@@ -33,9 +33,12 @@ class TransactionListCreateView(APIView):
 
     def post(self, request, account_id):
         account = get_object_or_404(Account, id=account_id, user=request.user)
-        serializer = TransactionCreateSerializer(data=request.data)
+        serializer = TransactionCreateSerializer(
+            data=request.data,
+            context={"account": account}
+            )
         if serializer.is_valid():
-            serializer.save(account=account)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -74,5 +77,7 @@ class TransactionRetrieveUpdateDestroyViewView(APIView):
             account__id=account_id,
             account__user=request.user
             )
+        account = transaction.account
         transaction.delete()
+        recalc_account_balances(account)
         return Response({"msg":"Deleted"}, status=status.HTTP_200_OK)

@@ -80,4 +80,3 @@ class User(AbstractUser):
     def is_superuser(self):
         return self.is_admin
 
-# 해시테이블

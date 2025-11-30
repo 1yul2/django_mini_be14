@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import environ
-import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,9 +26,13 @@ environ.Env.read_env(BASE_DIR / ".env")
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list(
+    "ALLOWED_HOSTS",
+    default=["localhost", "127.0.0.1", "backend"],
+)
+
 
 
 # Application definition
@@ -160,11 +163,13 @@ REST_FRAMEWORK = {
 # 토큰 유효기간 설정
 
 from datetime import timedelta
-...
+
+ACCESS_TOKEN_MINUTES = env.int("ACCESS_TOKEN_MINUTES", default=60)
+REFRESH_TOKEN_DAYS = env.int("REFRESH_TOKEN_DAYS", default=7)   
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=ACCESS_TOKEN_MINUTES),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=REFRESH_TOKEN_DAYS),
     'ROTATE_REFRESH_TOKENS': True, 
     'SIGNING_KEY': SECRET_KEY, 
     "TOKEN_OBTAIN_SERIALIZER": "user.utils.jwt_serializers.MyTokenObtainPairSerializer",
@@ -173,6 +178,12 @@ SIMPLE_JWT = {
 
 
 # react 주소랑 연결
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vite dev 서버
-]
+CORS_ALLOWED_ORIGINS = env.list(
+    "CORS_ALLOWED_ORIGINS",
+    default=[
+        "http://localhost",
+        "http://localhost:80",
+        "http://127.0.0.1",
+        "http://127.0.0.1:80",
+    ],
+)
