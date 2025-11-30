@@ -1,14 +1,18 @@
 # from django.shortcuts import render
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.generics import CreateAPIView
-from .serializers import SignUpSerializer, UserSerializer   
-from rest_framework.permissions import IsAuthenticated, AllowAny 
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status, permissions 
+from rest_framework import status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import BlacklistToken
+from django.contrib.auth import authenticate
 from datetime import datetime
+
+from .serializers import SignUpSerializer, UserSerializer, LoginSerializer
+from .models import BlacklistToken
+
 
 # 회원가입 
 class SignUpAPIView(CreateAPIView):
@@ -20,9 +24,7 @@ class SignUpAPIView(CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 # 로그아웃
 class LogoutAPIView(APIView):
@@ -30,8 +32,13 @@ class LogoutAPIView(APIView):
 
     def post(self, request, *args, **kwargs):
         refresh_token = request.data.get("refresh")
+
         if not refresh_token:
-            return Response({"message": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Refresh token is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         try:
             token = RefreshToken(refresh_token)
             BlacklistToken.objects.create(
@@ -39,37 +46,42 @@ class LogoutAPIView(APIView):
                 token=str(refresh_token),
                 expires_at=datetime.fromtimestamp(token["exp"]),
             )
-            return Response({"message": "Successfully logged out"}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"message": "Failed to logout"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Successfully logged out"},
+                status=status.HTTP_200_OK,
+            )
+
+        except Exception:
+            return Response(
+                {"message": "Failed to logout"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 # 유저 조회
 class UserProfileAPIView(APIView):
-    permission_classes = [IsAuthenticated]  
+    permission_classes = [IsAuthenticated]
 
-    def get(self, request, *args, **kwargs): # 유저 프로필 조회 
-        user = request.user
-        serializer = UserSerializer(user)
+    def get(self, request, *args, **kwargs): # 유저 프로필 조회
+        serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 # 유저 수정
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def patch(self, request, *args, **kwargs): 
-        user = request.user
-        serializer = UserSerializer(user, data=request.data)
+    @swagger_auto_schema(request_body=UserSerializer)
+    def patch(self, request, *args, **kwargs):
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 유저 삭제
 class UserProfileDeleteAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
-        user = request.user
-        user.soft_delete()
+        request.user.soft_delete()
         return Response({"message": "Deleted successfully"}, status=status.HTTP_200_OK)

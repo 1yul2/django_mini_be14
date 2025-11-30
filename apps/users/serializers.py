@@ -5,33 +5,47 @@ from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
+
+# 회원가입
 class SignUpSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = User
         fields = ["email", "username", "phone", "password"]
         extra_kwargs = {
             "password": {"write_only": True},
-                }   
+        }
+
     def validate(self, data):
-        user = User(**data)
-
-        errors = dict()
+        """
+        password validation (Django 기본 패스워드 정책 적용)
+        """
         try:
-            validate_password(password=data["password"], user=user)
+            validate_password(password=data["password"], user=User(**data))
         except ValidationError as e:
-            errors['password'] = list(e.messages)
-
-        if errors:
-            raise serializers.ValidationError(errors)
-        return super().validate(data)
+            raise serializers.ValidationError({"password": e.messages})
+        return data
 
     def create(self, validated_data):
-        user = User(**validated_data)
+        """
+        비밀번호는 set_password로 해싱
+        """
+        user = User(
+            email=validated_data["email"],
+            username=validated_data["username"],
+            phone=validated_data["phone"],
+        )
         user.set_password(validated_data["password"])
         user.save()
-        return user 
+        return user
 
+# 로그인
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+
+# 프로필 조회 / 수정
+# delete는 views에서 처리하니까 지웠어요
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -39,12 +53,11 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ["email", "created_at"]
 
     def update(self, instance, validated_data):
+        """
+        username, phone만 수정 가능
+        """
         instance.username = validated_data.get("username", instance.username)
         instance.phone = validated_data.get("phone", instance.phone)
         instance.save()
-        return instance 
-        
-    def delete(self, instance):
-        instance.is_active = False
-        instance.save()
-        return instance 
+        return instance
+
