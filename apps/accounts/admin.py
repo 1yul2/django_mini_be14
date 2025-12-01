@@ -1,3 +1,5 @@
-# from django.contrib import admin
+from django.contrib import admin
+from .models import Accounts, BankCodes
 
-# Register your models here.
+admin.site.register(Accounts)
+admin.site.register(BankCodes)
